@@ -1,10 +1,6 @@
 const axios = require("axios");
 
 const { normalizeOffer, toAbsoluteUrl } = require("../utils/offerNormalizer");
-const {
-  createFlipkartProductSchema,
-  createStagehandForFlipkart,
-} = require("../utils/stagehandClient");
 
 class FlipkartSource {
   constructor(env) {
@@ -40,11 +36,18 @@ class FlipkartSource {
   }
 
   isAvailable() {
-    return this.enabled;
+    return (
+      this.enabled &&
+      (this.hasAffiliateApiCredentials() || this.hasStagehandCredentials())
+    );
   }
 
   getUnavailableReason() {
-    return "Source is turned off in the current setup.";
+    if (!this.enabled) {
+      return "Source is turned off in the current setup.";
+    }
+
+    return "Add Flipkart Affiliate credentials or Stagehand model credentials to use Flipkart results.";
   }
 
   sanitizeProductUrl(value) {
@@ -481,6 +484,10 @@ class FlipkartSource {
       );
     }
 
+    const {
+      createFlipkartProductSchema,
+      createStagehandForFlipkart,
+    } = require("../utils/stagehandClient");
     const stagehand = createStagehandForFlipkart(this.stagehandConfig);
 
     try {
