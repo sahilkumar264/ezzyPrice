@@ -21,5 +21,10 @@ const ensureServicesReady = () => {
 
 module.exports = async (req, res) => {
   await ensureServicesReady();
+
+  if (req.url && !req.url.startsWith("/api")) {
+    req.url = `/api${req.url}`;
+  }
+
   return app(req, res);
 };
