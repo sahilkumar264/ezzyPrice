@@ -1,129 +1,107 @@
 # ezzyPrice
 
-ezzyPrice is a MERN-based price comparison project where users can create private accounts, verify email signup with OTP, and compare product prices from multiple e-commerce platforms in one place.
+ezzyPrice is a price comparison app with private user accounts, email OTP signup, Google sign-in, search history, and cached product lookups across multiple shopping sources.
 
-## Current scope
+## Tech Stack
 
-- React frontend with an ezzyPrice-branded auth flow and comparison dashboard
-- Express backend with a layered folder structure
-- eBay integration with API-first logic and scraper fallback
-- Amazon integration through SerpApi
-- Flipkart integration with Affiliate API first and Stagehand browser fallback
-- Snapdeal scraper
-- Redis cache for repeated searches and recent-search reads
-- Email/password authentication with private user accounts
-- Email OTP verification for email/password signup
-- Google sign-in with backend token verification
-- Normalized comparison results across sources
-- MongoDB-backed user accounts and user-specific recent searches
-- No alerts, cron jobs, or notifications in this phase
+- Frontend: React, Vite, Axios
+- Backend: Node.js, Express, MongoDB, Redis
+- Auth: JWT httpOnly cookies, bcrypt, Google ID token verification
+- Product sources: eBay, Amazon SerpApi, Flipkart, Snapdeal
 
-## Project structure
+## Project Structure
 
 ```text
-price-comparison-app/
-  backend/
-    src/
-      config/
-      controllers/
-      middleware/
-      models/
-      routes/
-      services/
-      sources/
-      utils/
-  frontend/
-    src/
-      api/
-      components/
-      styles/
+backend/
+  api/              Vercel serverless entry
+  src/
+    config/         environment, database, redis
+    controllers/    request handlers
+    middleware/     auth and error middleware
+    models/         mongoose models
+    routes/         API routes
+    services/       auth and product search logic
+    sources/        marketplace adapters
+    utils/          shared helpers
+
+frontend/
+  src/
+    api/            API clients
+    components/     UI components
+    styles/         global styles
 ```
 
-## Backend setup
+## Local Setup
 
-1. Open `D:\price-comparison-app\backend`
-2. Create `.env` from `.env.example`
-3. Install dependencies with `npm install`
-4. Start the server with `npm run dev`
+Backend:
 
-Optional Redis setup:
+```powershell
+cd backend
+copy .env.example .env
+npm install
+npm run dev
+```
 
-1. Run Redis locally or use a hosted Redis instance
-2. Set `REDIS_URL` in `backend/.env`
-3. Keep `ENABLE_REDIS_CACHE=true`
+Frontend:
 
-Authentication setup:
+```powershell
+cd frontend
+copy .env.example .env
+npm install
+npm run dev
+```
 
-1. Add `AUTH_JWT_SECRET` in `backend/.env`
-2. Add `GOOGLE_CLIENT_ID` in `backend/.env` if you want Google sign-in
-3. Add SMTP email settings in `backend/.env` for signup OTP emails
-4. Keep MongoDB connected, because user accounts need the database
+Use `npm.cmd run dev` if PowerShell blocks `npm.ps1`.
 
-## Frontend setup
+## Required Services
 
-1. Open `D:\price-comparison-app\frontend`
-2. Create `.env` from `.env.example`
-3. Install dependencies with `npm install`
-4. Start the client with `npm run dev`
+- MongoDB is required for users, OTP requests, and search history.
+- Redis is optional locally, but recommended for cached searches and recent-search reads.
+- SMTP is required for email OTP signup.
+- Google OAuth is required only if Google sign-in is enabled.
 
-Google sign-in setup:
+For local Redis with Docker:
 
-1. Add `VITE_GOOGLE_CLIENT_ID` in `frontend/.env`
-2. Use the same Google client ID in both frontend and backend env files
+```powershell
+docker run --name ezzyprice-redis -p 6379:6379 -d redis:7-alpine
+```
 
-Signup OTP email setup:
+For production, use hosted Redis such as Upstash. A local Docker Redis container cannot be reached from Vercel.
 
-1. Add `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, and `SMTP_PASS`
-2. Add `MAIL_FROM_EMAIL` and `MAIL_FROM_NAME`
-3. For Gmail, use an App Password instead of your normal account password
+## Vercel Deployment
 
-## Notes
+Deploy as two Vercel projects:
 
-- eBay tries the official API first when credentials are present and falls back to scraping only if the API call fails.
-- Amazon uses SerpApi only. Add `AMAZON_SERPAPI_KEY` in the backend `.env` to enable Amazon results.
-- Flipkart tries the official Affiliate API first and falls back to Stagehand running a local browser session.
-- Flipkart Stagehand uses Gemini by default. Add `GEMINI_API_KEY`, `GOOGLE_API_KEY`, or `FLIPKART_STAGEHAND_MODEL_API_KEY` to enable it.
-- Stagehand runs in `LOCAL` mode by default, so the browser opens on your own machine instead of a paid cloud browser.
-- Search results are cached in Redis for a short time to speed up repeated queries and reduce source calls.
-- Recent searches are cached per user in Redis and cleared when a new search is saved.
-- If Redis is not running, the app still works and simply skips the cache.
-- Product search and recent-history routes are protected, so each user only sees their own account data.
-- Email/password signup now sends a 6-digit OTP to the user's email before the account is created.
-- If a source fails or returns no products, it is hidden from the frontend response.
-- Scrapers and browser-based flows may need small selector updates if site layouts change.
-- MongoDB is required for authentication and for keeping user search history.
-- This version intentionally matches the current phase 2 scope only.
+1. `backend/` as the API project.
+2. `frontend/` as the Vite project.
 
-## Docker setup
+Backend environment:
 
-The project is now container-ready.
+```env
+NODE_ENV=production
+CLIENT_URL=https://your-frontend.vercel.app
+CLIENT_URLS=https://your-frontend.vercel.app
+MONGODB_URI=your_mongodb_atlas_uri
+REDIS_URL=rediss://default:password@host.upstash.io:6379
+ENABLE_REDIS_CACHE=true
+AUTH_JWT_SECRET=use_a_long_random_secret
+AUTH_COOKIE_SECURE=true
+AUTH_COOKIE_SAME_SITE=none
+GOOGLE_CLIENT_ID=your_google_client_id
+SMTP_HOST=your_smtp_host
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_password
+MAIL_FROM_EMAIL=your_sender_email
+MAIL_FROM_NAME=ezzyPrice
+```
 
-### Run with Docker Compose
+Frontend environment:
 
-1. Add your real values to `backend/.env`
-2. Optionally export a Google client ID before build:
-   `set VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com`
-3. Start the stack:
-   `docker compose up --build`
+```env
+VITE_API_BASE_URL=https://your-backend.vercel.app/api
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+```
 
-### Services
-
-- Frontend: `http://localhost:8080`
-- Backend API: `http://localhost:5000`
-- Redis: `redis://127.0.0.1:6379`
-
-### Docker files added
-
-- `backend/Dockerfile`
-- `backend/.dockerignore`
-- `frontend/Dockerfile`
-- `frontend/nginx.conf`
-- `frontend/.dockerignore`
-- `docker-compose.yml`
-
-### Production notes
-
-- For HTTPS deployment, set `AUTH_COOKIE_SECURE=true`
-- If frontend and backend are on the same public domain through a reverse proxy, you can keep `VITE_API_BASE_URL=/api`
-- Update `CLIENT_URL` and `CLIENT_URLS` in the backend env to your deployed frontend domain
-- For AWS, EC2, ECS, App Runner, or Docker-based hosts, the current Docker setup is ready to adapt
+Add both local and deployed frontend URLs to the Google OAuth client under Authorized JavaScript origins.

@@ -7,7 +7,7 @@ function SearchForm({ value, onChange, onSubmit, isLoading }) {
             Search any product
           </label>
           <p className="search-form__hint">
-            ezzyPrice scans your active stores and lines up the live offers in one view.
+            ezzyPrice checks your available stores and brings the matching offers together.
           </p>
         </div>
       </div>

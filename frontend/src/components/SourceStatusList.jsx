@@ -8,11 +8,6 @@ const formatStatus = (status) => {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 };
 
-const formatSourceType = (value) =>
-  String(value || "source")
-    .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-
 function SourceStatusList({ items }) {
   if (!items?.length) {
     return null;
@@ -22,8 +17,8 @@ function SourceStatusList({ items }) {
     <section className="panel">
       <div className="panel-heading">
         <div>
-          <p className="eyebrow">Source engine</p>
-          <h2 className="panel-title">Platforms used in this ezzyPrice search</h2>
+          <p className="eyebrow">Stores checked</p>
+          <h2 className="panel-title">Stores checked for this search</h2>
         </div>
       </div>
 
@@ -36,7 +31,6 @@ function SourceStatusList({ items }) {
                 {formatStatus(item.status)}
               </span>
             </div>
-            <p className="source-card__type">{formatSourceType(item.sourceType)}</p>
             <p className="source-card__meta">{item.resultCount} matches</p>
             {item.message ? <p className="source-card__message">{item.message}</p> : null}
           </article>

@@ -1,15 +1,3 @@
-const formatSourceType = (sourceType) => {
-  const labels = {
-    api: "API",
-    scraper: "Scraper",
-    "browser-dom": "Browser",
-    "ai-agent": "AI assist",
-    hybrid: "Mixed",
-  };
-
-  return labels[sourceType] || sourceType;
-};
-
 function OfferCard({ offer, isBestOffer }) {
   return (
     <article className={`offer-card${isBestOffer ? " offer-card--best" : ""}`}>
@@ -26,7 +14,6 @@ function OfferCard({ offer, isBestOffer }) {
       <div className="offer-body">
         <div className="offer-topline">
           <span className="platform-badge">{offer.platform}</span>
-          <span className="source-badge">{formatSourceType(offer.sourceType)}</span>
         </div>
 
         <h3 className="offer-title">{offer.title}</h3>

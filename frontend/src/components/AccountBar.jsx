@@ -25,7 +25,7 @@ function AccountBar({ user, onLogout, isLoggingOut }) {
           <p className="eyebrow">Signed in</p>
           <h2>{user.name}</h2>
           <p className="account-bar__meta">
-            {user.email} · {providerLabel}
+            {user.email} | {providerLabel}
           </p>
         </div>
       </div>

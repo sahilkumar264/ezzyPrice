@@ -1,6 +1,7 @@
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const express = require("express");
+const helmet = require("helmet");
 
 const env = require("./config/env");
 const createHttpError = require("./utils/createHttpError");
@@ -9,6 +10,16 @@ const errorHandler = require("./middleware/errorHandler");
 const notFound = require("./middleware/notFound");
 
 const app = express();
+
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false,
+  })
+);
 
 app.use(
   cors({

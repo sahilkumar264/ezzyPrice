@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
 
@@ -32,11 +32,37 @@ const loadGoogleScript = () =>
 
 function GoogleSignInButton({ clientId, disabled, onCredential, onError }) {
   const containerRef = useRef(null);
+  const shellRef = useRef(null);
+  const [buttonWidth, setButtonWidth] = useState(320);
+  const [statusMessage, setStatusMessage] = useState("");
+
+  useEffect(() => {
+    if (!shellRef.current) {
+      return undefined;
+    }
+
+    const updateWidth = () => {
+      const nextWidth = Math.max(240, Math.floor(shellRef.current?.clientWidth || 320));
+      setButtonWidth(nextWidth);
+    };
+
+    updateWidth();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateWidth();
+    });
+
+    resizeObserver.observe(shellRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     let isCancelled = false;
 
-    if (!clientId || !containerRef.current) {
+    if (!clientId || !containerRef.current || !buttonWidth) {
       return undefined;
     }
 
@@ -71,11 +97,17 @@ function GoogleSignInButton({ clientId, disabled, onCredential, onError }) {
           size: "large",
           text: "continue_with",
           shape: "pill",
-          width: 320,
+          width: buttonWidth,
+          logo_alignment: "left",
         });
+
+        setStatusMessage("");
       } catch (error) {
+        const message = error.message || "Google sign-in could not be loaded.";
+
         if (!isCancelled) {
-          onError?.(error.message || "Google sign-in could not be loaded.");
+          setStatusMessage(message);
+          onError?.(message);
         }
       }
     };
@@ -85,7 +117,7 @@ function GoogleSignInButton({ clientId, disabled, onCredential, onError }) {
     return () => {
       isCancelled = true;
     };
-  }, [clientId, disabled, onCredential, onError]);
+  }, [buttonWidth, clientId, disabled, onCredential, onError]);
 
   if (!clientId) {
     return (
@@ -97,7 +129,16 @@ function GoogleSignInButton({ clientId, disabled, onCredential, onError }) {
 
   return (
     <div className={`google-button-wrap${disabled ? " google-button-wrap--disabled" : ""}`}>
-      <div ref={containerRef} />
+      <div className="google-button-shell" ref={shellRef}>
+        <div className="google-button-visual" aria-hidden="true">
+          <span className="google-button-visual__icon">
+            <span className="google-button-visual__g">G</span>
+          </span>
+          <span className="google-button-visual__label">Continue with Google</span>
+        </div>
+        <div className="google-button-target" ref={containerRef} />
+        {statusMessage ? <p className="auth-helper">{statusMessage}</p> : null}
+      </div>
     </div>
   );
 }

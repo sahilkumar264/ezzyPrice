@@ -83,6 +83,14 @@ const env = {
       1,
       toNumber(process.env.AUTH_SIGNUP_OTP_MAX_ATTEMPTS, 5)
     ),
+    rateLimitWindowMs: Math.max(
+      60_000,
+      toNumber(process.env.AUTH_RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000)
+    ),
+    rateLimitMaxRequests: Math.max(
+      5,
+      toNumber(process.env.AUTH_RATE_LIMIT_MAX_REQUESTS, 25)
+    ),
   },
   mail: {
     host: process.env.SMTP_HOST || "",
@@ -92,17 +100,6 @@ const env = {
     pass: process.env.SMTP_PASS || "",
     fromEmail: process.env.MAIL_FROM_EMAIL || process.env.SMTP_USER || "",
     fromName: process.env.MAIL_FROM_NAME || "Price Comparison App",
-  },
-  playwright: {
-    headless: toBoolean(process.env.PLAYWRIGHT_HEADLESS, true),
-    launchTimeoutMs: toNumber(process.env.PLAYWRIGHT_LAUNCH_TIMEOUT_MS, 30000),
-    navigationTimeoutMs: toNumber(process.env.PLAYWRIGHT_NAVIGATION_TIMEOUT_MS, 30000),
-    browserChannels: toArray(process.env.PLAYWRIGHT_BROWSER_CHANNELS, [
-      "chrome",
-      "msedge",
-    ]),
-    executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH || "",
-    storageStatePath: process.env.PLAYWRIGHT_STORAGE_STATE_PATH || "",
   },
   sources: {
     ebay: {
@@ -136,10 +133,7 @@ const env = {
           process.env.OPENAI_API_KEY ||
           "",
         headless: toBoolean(process.env.FLIPKART_STAGEHAND_HEADLESS, true),
-        executablePath:
-          process.env.FLIPKART_STAGEHAND_EXECUTABLE_PATH ||
-          process.env.PLAYWRIGHT_EXECUTABLE_PATH ||
-          "",
+        executablePath: process.env.FLIPKART_STAGEHAND_EXECUTABLE_PATH || "",
         userDataDir: process.env.FLIPKART_STAGEHAND_USER_DATA_DIR || "",
         locale: process.env.FLIPKART_STAGEHAND_LOCALE || "en-IN",
         timeoutMs: toNumber(process.env.FLIPKART_STAGEHAND_TIMEOUT_MS, 45000),
@@ -152,5 +146,16 @@ const env = {
 };
 
 env.clientUrl = env.clientUrls[0] || "http://localhost:5173";
+
+if (
+  env.nodeEnv === "production" &&
+  env.auth.jwtSecret === "price-comparison-dev-secret-change-me"
+) {
+  throw new Error("Set a real AUTH_JWT_SECRET before starting the app in production.");
+}
+
+if (env.auth.cookieSameSite === "none" && !env.auth.cookieSecure) {
+  throw new Error("AUTH_COOKIE_SECURE must be true when AUTH_COOKIE_SAME_SITE=none.");
+}
 
 module.exports = env;

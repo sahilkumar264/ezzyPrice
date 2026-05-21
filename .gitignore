@@ -1,20 +1,12 @@
 node_modules/
 dist/
-.env
-.env.local
-*.log
-
-node_modules/
-
-.env
-frontend/.env
-backend/.env
-
-logs
-*.log
-
-dist/
 build/
 
+.env
+.env.local
+backend/.env
+frontend/.env
 
+logs/
+*.log
 .DS_Store

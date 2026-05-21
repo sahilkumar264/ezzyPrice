@@ -8,7 +8,7 @@ function RecentSearches({ items, onReuse }) {
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Your history</p>
-          <h2 className="panel-title">Recent ezzyPrice lookups</h2>
+          <h2 className="panel-title">Recent searches</h2>
         </div>
       </div>
 

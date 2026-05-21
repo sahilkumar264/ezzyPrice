@@ -62,7 +62,6 @@ const connectRedis = async () => {
     try {
       client.destroy();
     } catch (destroyError) {
-      // best effort cleanup
     }
 
     redisClient = null;
@@ -84,7 +83,6 @@ const disconnectRedis = async () => {
     try {
       client.disconnect();
     } catch (disconnectError) {
-      // best effort cleanup
     }
   }
 };

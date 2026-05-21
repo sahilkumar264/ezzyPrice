@@ -23,16 +23,16 @@ const isUnauthorizedError = (error) => error?.response?.status === 401;
 
 const authHighlights = [
   {
-    label: "Live store scan",
-    value: "API + browser mix",
+    label: "Quick comparisons",
+    value: "Compare offers in one clean view",
   },
   {
-    label: "Private history",
-    value: "Per-user search timeline",
+    label: "Private account",
+    value: "Your searches stay with your profile",
   },
   {
-    label: "Smart auth",
-    value: "Email OTP + Google sign-in",
+    label: "Secure sign-in",
+    value: "Email verification and Google login",
   },
 ];
 
@@ -174,7 +174,6 @@ function App() {
     try {
       await logoutUser();
     } catch (error) {
-      // Keep the UI cleanup even if the cookie was already gone.
     } finally {
       setUser(null);
       setSignupStep("details");
@@ -252,10 +251,8 @@ function App() {
   if (isBootLoading) {
     return (
       <main className="app-shell app-shell--loading">
-        <div className="scene-orb scene-orb--orange" />
-        <div className="scene-orb scene-orb--teal" />
         <section className="panel panel--empty">
-          <p className="loading-copy">Loading your ezzyPrice workspace...</p>
+          <p className="loading-copy">Loading ezzyPrice...</p>
         </section>
       </main>
     );
@@ -264,9 +261,6 @@ function App() {
   if (!user) {
     return (
       <main className="app-shell app-shell--auth-scene">
-        <div className="scene-orb scene-orb--orange" />
-        <div className="scene-orb scene-orb--teal" />
-
         <section className="brand-stage">
           <div className="brand-mark brand-mark--hero">
             <span className="brand-mark__spark" />
@@ -274,16 +268,16 @@ function App() {
           </div>
 
           <div className="brand-stage__copy">
-            <p className="eyebrow">Price intelligence for everyday shopping</p>
-            <h1>Spot the sharpest deal before anyone else clicks buy.</h1>
+            <p className="eyebrow">Price comparison</p>
+            <h1>Compare prices before you buy.</h1>
             <p className="hero-text">
-              ezzyPrice brings together live marketplace data, secure private accounts,
-              and a polished comparison experience built for fast decisions.
+              Search once, review matching offers, and keep your recent searches
+              tied to your account.
             </p>
 
             <div className="hero-pills">
-              <span className="hero-pill">3D product cards</span>
-              <span className="hero-pill">Email OTP security</span>
+              <span className="hero-pill">Live product search</span>
+              <span className="hero-pill">Email OTP signup</span>
               <span className="hero-pill">Google sign-in</span>
             </div>
           </div>
@@ -329,9 +323,6 @@ function App() {
 
   return (
     <main className="app-shell app-shell--dashboard">
-      <div className="scene-orb scene-orb--orange" />
-      <div className="scene-orb scene-orb--teal" />
-
       <header className="brand-header">
         <div className="brand-mark">
           <span className="brand-mark__spark" />
@@ -339,8 +330,8 @@ function App() {
         </div>
 
         <div className="brand-header__status">
-          <span className="brand-header__chip">Live product comparison</span>
-          <span className="brand-header__chip">Private account workspace</span>
+          <span className="brand-header__chip">Live comparisons</span>
+          <span className="brand-header__chip">Your private account</span>
         </div>
       </header>
 
@@ -349,17 +340,17 @@ function App() {
       <section className="hero hero--ezzy">
         <div className="hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">ezzyPrice command deck</p>
+            <p className="eyebrow">Search across stores</p>
             <h1>Compare prices across stores without losing your flow.</h1>
             <p className="hero-text">
-              Search once, review the best live offers, and keep your history saved
-              inside your own account. Designed to feel fast, premium, and clear.
+              Search once, compare store prices, and keep your recent lookups saved
+              in your own account.
             </p>
 
             <div className="hero-pills">
-              <span className="hero-pill">API-first sources</span>
-              <span className="hero-pill">Fallback scraping</span>
-              <span className="hero-pill">Redis-boosted repeats</span>
+              <span className="hero-pill">Fresh price checks</span>
+              <span className="hero-pill">Your recent searches</span>
+              <span className="hero-pill">One simple comparison board</span>
             </div>
           </div>
 
@@ -397,7 +388,7 @@ function App() {
             <div className="panel-heading">
               <div>
                 <p className="eyebrow">Offer board</p>
-                <h2 className="panel-title">Live product cards from active platforms</h2>
+                <h2 className="panel-title">Matching products from the stores we found</h2>
               </div>
             </div>
 
@@ -427,7 +418,7 @@ function App() {
       ) : (
         <section className="panel panel--empty">
           <p className="loading-copy">
-            Start with a product name and ezzyPrice will build your comparison board.
+            Search for a product and ezzyPrice will build your comparison board.
           </p>
         </section>
       )}
