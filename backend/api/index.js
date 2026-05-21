@@ -7,7 +7,7 @@ let readyPromise = null;
 
 const ensureServicesReady = () => {
   if (!readyPromise) {
-    readyPromise = Promise.all([
+    readyPromise = Promise.allSettled([
       connectDatabase(env.mongoUri),
       connectRedis(),
     ]).catch((error) => {
